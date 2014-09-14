@@ -48,8 +48,12 @@ while isRunning:
         pixelY = y * cellHeight 
         pos = pygame.Rect((pixelX, pixelY), (cellWidth, cellHeight))
         
-        color = pygame.Color(int(255 * cell), int(255 * cell), int(0 * cell))
+        if cell <= 0:
+            color = pygame.Color(*colorKey)
+        else:
+            color = pygame.Color(int(255 * cell), int(190 * cell), 0)
         
+        #color.a = 255
         pygame.draw.rect(simulationSurface, color, pos)
     
     simulationPos = [50, 50]
