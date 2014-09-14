@@ -1,3 +1,7 @@
+# http://stackoverflow.com/questions/1823058/how-to-print-number-with-commas-as-thousands-separators
+import locale
+locale.setlocale(locale.LC_ALL,"")
+
 import os
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0, 30)   #initial window position
  
@@ -11,9 +15,14 @@ pygame.display.set_caption ("Greenhouse simulation")
 
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("timesnewromans", 40)
+font2 = pygame.font.SysFont("timesnewromans", 25)
 
 Menu_PlantTree = font.render("Plant Trees", True, (255,255,255))
 Mode = "Planting Mode"
+Money = 1000
+
+Year = 1984
+CurrentYearPos = 0.0
 
 simulation = simulation.Simulation()
 mapImage = pygame.image.load("map.png")
@@ -76,6 +85,9 @@ while isRunning:
     
     screen.blit(simulationSurface, simulationPos)
 
+    for pos in treeList:
+        screen.blit(treeImage, pos)
+
     color = pygame.Color(255, 255, 255)
     pos = [simulationPos[0] + maxSimulationSize[0] - 70, simulationPos[1]]
     size = [20, maxSimulationSize[1] - 5]
@@ -93,13 +105,16 @@ while isRunning:
     size[1] = newHeight
     polutionDensityRect = pygame.Rect(pos, size)
     pygame.draw.rect(screen, color, polutionDensityRect)
-    
+        
     mousePos = pygame.mouse.get_pos()
     mouseClick = pygame.mouse.get_pressed()
     
     # plant trees    
     simulationRect = pygame.Rect(simulationPos, simulationSize)
-    if mouseClick[0] and Mode == "Planting Mode" and simulationRect.collidepoint(mousePos):
+    if mouseClick[0] and \
+        Mode == "Planting Mode" and \
+        simulationRect.collidepoint(mousePos) and \
+        Money > 0:
         cellX = (mousePos[0] - simulationPos[0]) / cellWidth
         cellY = (mousePos[1] - simulationPos[1]) / cellHeight
         
@@ -111,17 +126,17 @@ while isRunning:
         size = treeImage.get_size()
         pos = [mousePos[0] - (size[0] / 2), mousePos[1] - (size[1] / 2)]
         treeList.append(pos)
+        
+        Money -= 1
 
-    for pos in treeList:
-        screen.blit(treeImage, pos)
-    
     # menu
     MenuPos = [simulationPos[0] + maxSimulationSize[0] + size[0], simulationPos[1]]
     
     pygame.draw.rect(screen, pygame.Color(100, 128, 128), pygame.Rect(MenuPos, [300, maxSimulationSize[1]]))
     
+    ButtonPlantingMode = pygame.Rect(MenuPos, [300, 73])
     if Mode == "Planting Mode":
-        pygame.draw.rect(screen, pygame.Color(50, 20, 40), pygame.Rect(MenuPos, [300, 73]))
+        pygame.draw.rect(screen, pygame.Color(50, 20, 40), ButtonPlantingMode)
         
     TextPos = [MenuPos[0] + 70, MenuPos[1] + 20]
     screen.blit(Menu_PlantTree, TextPos)
@@ -129,6 +144,61 @@ while isRunning:
     MenuPos[1] += 70
     
     pygame.draw.line(screen, [255, 255, 255], MenuPos, [MenuPos[0] + 298, MenuPos[1]])
+
+    MenuPos[1] += 10
+    TextPos = [MenuPos[0] + 20, MenuPos[1]]
+    Menu_Tax = font.render("+           TAX            -", True, (255,255,255))
+    screen.blit(Menu_Tax, TextPos)
+
+    MenuPos[1] += 40
+    pygame.draw.line(screen, [255, 255, 255], MenuPos, [MenuPos[0] + 298, MenuPos[1]])
+
+    MenuPos[1] += 10
+    TextPos = [MenuPos[0] + 20, MenuPos[1]]
+    Menu_Tax = font2.render("Pass Business friendly bill", True, (255,255,255))
+    screen.blit(Menu_Tax, TextPos)
+
+    MenuPos[1] += 30
+    pygame.draw.line(screen, [255, 255, 255], MenuPos, [MenuPos[0] + 298, MenuPos[1]])
+
+    MenuPos[1] += 10
+    TextPos = [MenuPos[0] + 20, MenuPos[1]]
+    Menu_Tax = font2.render("Pass Tourism friendly bill", True, (255,255,255))
+    screen.blit(Menu_Tax, TextPos)
+
+    MenuPos[1] += 30
+    pygame.draw.line(screen, [255, 255, 255], MenuPos, [MenuPos[0] + 298, MenuPos[1]])
+
+    MenuPos[1] += 10
+    TextPos = [MenuPos[0] + 20, MenuPos[1]]
+    Menu_Tax = font2.render("Government Initiative: Green bill", True, (255,255,255))
+    screen.blit(Menu_Tax, TextPos)
+
+    MenuPos[1] += 30
+    pygame.draw.line(screen, [255, 255, 255], MenuPos, [MenuPos[0] + 298, MenuPos[1]])
+
+
+    MenuPos[1] += 190
+    TextPos = [MenuPos[0] + 20, MenuPos[1]]
+    Menu_Money = font.render("Treasury: %sm" % (str(locale.format("%d", Money, grouping=True))), True, (255,255,255))
+    screen.blit(Menu_Money, TextPos)
+
+    if mouseClick[0] and ButtonPlantingMode.collidepoint(mousePos):
+        Mode = "Planting Mode"
+
+    MenuPos[1] += 70
+    TextPos = [MenuPos[0] + 80, MenuPos[1] + 10]
+    Menu_Year = font.render("Year %i" % (Year), True, (255,255,255))
+    pygame.draw.rect(screen, pygame.Color(0, 40, 228), pygame.Rect(MenuPos, [300 * CurrentYearPos, 50]))
+    screen.blit(Menu_Year, TextPos)
+
+    if CurrentYearPos > 1:
+        CurrentYearPos = 0
+        Year += 1
+        Money += random.randint(100,300)
+        
+    CurrentYearPos += 0.01
+    
 
     simulation.update()
     pygame.display.update()
