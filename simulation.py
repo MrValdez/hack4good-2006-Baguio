@@ -5,6 +5,7 @@ class Simulation:
     def __init__(self):
         self.Vehicle = 0.0       # by the thousands
         self.Population = 0.0    # by the thousands
+        self.mapImage = None
 
         self.Width, self.Height = 50, 50
 #        self.Width, self.Height = 200, 200
@@ -18,8 +19,11 @@ class Simulation:
 
         self.PollutionDensity = 100     # 0 - 255. Affected by current date
         self.PollutionDensity = 180
-                
-    def update(self):
+
+    def setMapImage(self, mapImage):
+        self.mapImage = mapImage
+        
+    def update(self, Year):
         """
         1. spread polution
         2. lower polution with trees
@@ -33,9 +37,10 @@ class Simulation:
             self.UpdatePollution()
             
         self.UpdateTrees()
-        self.UpdateFuzzyLimit()
+        self.UpdateFuzzyLimit(Year)
         
     def UpdatePollution(self):           
+        # spread pollution
         for cellNumber, polution in enumerate(self.Grid):  
             x = math.trunc(cellNumber / self.Width)
             y = cellNumber % self.Width
@@ -59,7 +64,36 @@ class Simulation:
                 self.Grid[west] *= wDelta
                 self.Grid[east] *= eDelta
 
-    
+        # add pollution
+        if False:
+            #broken!
+            foo = self.mapImage.get_at([450, 52])
+            
+            width, height = self.mapImage.get_size()
+            Found = False
+            for y in range(0, height):
+                Found = False
+                for x in range(0, width):
+                    pixel = self.mapImage.get_at([x, y])
+                    pixel = [pixel[0], pixel[1], pixel[2]]
+                        
+    #                for red, green, blue in ([255, 225, 104], [255, 255, 255]):
+                    #red, green, blue = [255, 255, 255]
+                    red, green, blue = [240, 237, 229]
+                    #print(pixel)
+                    #print (red,pixel[0], green, pixel[1], blue, pixel[2])
+                    #print(red == pixel[0], green == pixel[1], blue == pixel[2])
+                    #if red == pixel[0] and green == pixel[1] and blue == pixel[2]:
+                    if red != pixel[0] and green != pixel[1] and blue != pixel[2]:
+                        pos = self.getIndex(x, y)
+                        if pos >= len(self.Grid):
+                            continue
+                        self.Grid[pos] = 0.5
+                        Found = True
+                        continue
+                            
+                    if Found: break
+                    
     def UpdateTrees(self):
         for cellNumber, treeDensity in enumerate(self.GridTree):        
             # trees
@@ -68,10 +102,15 @@ class Simulation:
                 
                 self.GridTree[cellNumber] *= 0.01
 
-    def UpdateFuzzyLimit(self):
+    def UpdateFuzzyLimit(self, Year):
         for cellNumber, _ in enumerate(self.Grid):
-            currentMinPollution = random.uniform(0, 0.3)
-            #currentMinPollution = 0.1
+            if Year > 1986:         #todo: should be based on real data
+                currentMinPollution = random.uniform(0, 0.2)
+            elif Year > 1987:
+                currentMinPollution = random.uniform(0, 0.3)
+            else: 
+                currentMinPollution = random.uniform(0, 0.1)
+                
             currentMaxPollution = random.uniform(self.maxPollution - 0.15, self.maxPollution)
             
             if self.Grid[cellNumber] < currentMinPollution:

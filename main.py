@@ -27,7 +27,16 @@ CurrentYearPos = 0.0
 CurrentPowerPos = [0.0, 0.0, 0.0]
 
 simulation = simulation.Simulation()
+
 mapImage = pygame.image.load("map.png")
+#maxSimulationSize = [550, 500]
+maxSimulationSize = [899, 555]
+cellWidth = int(maxSimulationSize[0] / simulation.Width)
+cellHeight = int(maxSimulationSize[1] / simulation.Height)
+simulationSize = (cellWidth * simulation.Width, cellHeight * simulation.Height)
+mapImageScaled = pygame.transform.smoothscale(mapImage, simulationSize)
+simulation.setMapImage(mapImageScaled)
+
 treeImage = pygame.image.load("tree.png")
 treeImage = pygame.transform.smoothscale(treeImage, [15, 15])
 treeImage.set_colorkey(treeImage.get_at([0,0]))
@@ -52,11 +61,6 @@ while isRunning:
         pygame.quit()
         break
     
-    #maxSimulationSize = [550, 500]
-    maxSimulationSize = [899, 555]
-    cellWidth = int(maxSimulationSize[0] / simulation.Width)
-    cellHeight = int(maxSimulationSize[1] / simulation.Height)
-    simulationSize = (cellWidth * simulation.Width, cellHeight * simulation.Height)
     simulationSurface = pygame.Surface(simulationSize)     # http://stackoverflow.com/questions/17581545/drawn-surface-transparency-in-pygame
     colorKey = [127, 33, 33]
     simulationSurface.fill(colorKey)
@@ -82,7 +86,6 @@ while isRunning:
             pygame.draw.circle(simulationSurface, color, pos, random.randint(cellWidth + 3, cellWidth + 8))
         
     simulationPos = [30, 50]
-    mapImageScaled = pygame.transform.smoothscale(mapImage, simulationSize)
     screen.blit(mapImageScaled, simulationPos)
     
     screen.blit(simulationSurface, simulationPos)
@@ -217,7 +220,7 @@ while isRunning:
         Year += 1
         Money += random.randint(100,300)
         
-    CurrentYearPos += 0.01
+    CurrentYearPos += 0.007
     
     CurrentPowerPos[0] += 0.002
     CurrentPowerPos[1] += 0.001
@@ -228,6 +231,6 @@ while isRunning:
             CurrentPowerPos[index] = 1
         
 
-    simulation.update()
+    simulation.update(Year)
     pygame.display.update()
     clock.tick(60)
