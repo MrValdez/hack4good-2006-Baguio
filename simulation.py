@@ -65,6 +65,8 @@ class Simulation:
             # trees
             if treeDensity > 0:
                 self.Grid[cellNumber] *= 1.0 - self.GridTree[cellNumber]
+                
+                self.GridTree[cellNumber] *= 0.01
 
     def UpdateFuzzyLimit(self):
         for cellNumber, _ in enumerate(self.Grid):
@@ -78,7 +80,6 @@ class Simulation:
             if self.Grid[cellNumber] > currentMaxPollution:
                 self.Grid[cellNumber] = currentMaxPollution 
                 
-
     def getIndex(self, x, y):
         return (y * self.Width) + x
         

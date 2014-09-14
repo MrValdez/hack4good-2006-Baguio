@@ -11,19 +11,24 @@ pygame.display.set_caption ("Greenhouse simulation")
 
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("timesnewromans", 40)
-text = font.render("Hello, World", True, (255,255,255))
+
+Menu_PlantTree = font.render("Plant Trees", True, (255,255,255))
+Mode = "Planting Mode"
 
 simulation = simulation.Simulation()
 mapImage = pygame.image.load("map.png")
+treeImage = pygame.image.load("tree.png")
+treeImage = pygame.transform.smoothscale(treeImage, [15, 15])
+treeImage.set_colorkey(treeImage.get_at([0,0]))
+
+treeList = []
 
 resolution = [1350, 700]
 screen = pygame.display.set_mode(resolution)
-
     
 isRunning = True
 while isRunning:
     screen.fill([0, 0, 0])
-    screen.blit(text, [0,0])
         
     keypress = pygame.key.get_pressed()
     
@@ -72,7 +77,7 @@ while isRunning:
     screen.blit(simulationSurface, simulationPos)
 
     color = pygame.Color(255, 255, 255)
-    pos = [simulationPos[0] + maxSimulationSize[0] - 50, simulationPos[1]]
+    pos = [simulationPos[0] + maxSimulationSize[0] - 70, simulationPos[1]]
     size = [20, maxSimulationSize[1] - 5]
     polutionDensityRect = pygame.Rect(pos, size)
     pygame.draw.rect(screen, color, polutionDensityRect)
@@ -89,10 +94,12 @@ while isRunning:
     polutionDensityRect = pygame.Rect(pos, size)
     pygame.draw.rect(screen, color, polutionDensityRect)
     
-    # plant trees    
     mousePos = pygame.mouse.get_pos()
+    mouseClick = pygame.mouse.get_pressed()
+    
+    # plant trees    
     simulationRect = pygame.Rect(simulationPos, simulationSize)
-    if simulationRect.collidepoint(mousePos):
+    if mouseClick[0] and Mode == "Planting Mode" and simulationRect.collidepoint(mousePos):
         cellX = (mousePos[0] - simulationPos[0]) / cellWidth
         cellY = (mousePos[1] - simulationPos[1]) / cellHeight
         
@@ -100,6 +107,28 @@ while isRunning:
         cellY = math.floor(cellY)
     
         simulation.PlantTree(cellX, cellY)
+    
+        size = treeImage.get_size()
+        pos = [mousePos[0] - (size[0] / 2), mousePos[1] - (size[1] / 2)]
+        treeList.append(pos)
+
+    for pos in treeList:
+        screen.blit(treeImage, pos)
+    
+    # menu
+    MenuPos = [simulationPos[0] + maxSimulationSize[0] + size[0], simulationPos[1]]
+    
+    pygame.draw.rect(screen, pygame.Color(100, 128, 128), pygame.Rect(MenuPos, [300, maxSimulationSize[1]]))
+    
+    if Mode == "Planting Mode":
+        pygame.draw.rect(screen, pygame.Color(50, 20, 40), pygame.Rect(MenuPos, [300, 73]))
+        
+    TextPos = [MenuPos[0] + 70, MenuPos[1] + 20]
+    screen.blit(Menu_PlantTree, TextPos)
+    
+    MenuPos[1] += 70
+    
+    pygame.draw.line(screen, [255, 255, 255], MenuPos, [MenuPos[0] + 298, MenuPos[1]])
 
     simulation.update()
     pygame.display.update()
