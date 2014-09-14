@@ -12,7 +12,7 @@ class Simulation:
         self.Grid = [0] * self.Width * self.Height          # this is the pollution grid (todo: variable name will be refactored later)
         self.GridTree = [0] * self.Width * self.Height      # what position has trees
 
-        self.PollutionSpeed = 10
+        self.PollutionSpeed = 14
         self.PollutionSpeedCurrent = 3
 
         self.maxPollution = 1.0
@@ -103,14 +103,24 @@ class Simulation:
                 self.GridTree[cellNumber] *= 0.01
 
     def UpdateFuzzyLimit(self, Year):
+        skip = 0
         for cellNumber, _ in enumerate(self.Grid):
+            if skip:
+                skip -= 1
+                continue
             if Year > 1986:         #todo: should be based on real data
-                currentMinPollution = random.uniform(0, 0.2)
+                currentMinPollution = random.uniform(-4.0, 0.2)
+                self.PopulationDensity = 150
             elif Year > 1987:
-                currentMinPollution = random.uniform(0, 0.3)
+                currentMinPollution = random.uniform(-5.0, 0.3)
             else: 
                 currentMinPollution = random.uniform(0, 0.1)
                 
+            if currentMinPollution < 0:
+                continue
+                
+            skip = random.randint(100, 310)            
+            
             currentMaxPollution = random.uniform(self.maxPollution - 0.15, self.maxPollution)
             
             if self.Grid[cellNumber] < currentMinPollution:

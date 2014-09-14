@@ -75,7 +75,8 @@ while isRunning:
         pixelX = x * cellWidth
         pixelY = y * cellHeight 
         
-        if cell >= 0.5:
+        if cell > 0.3:
+            if cell > 1: cell = 1
             #color = pygame.Color(int(255 * cell), int(190 * cell), 0)
             color = pygame.Color(int(230 * cell), int(250 * cell), int(116 * cell))
                     
@@ -83,7 +84,8 @@ while isRunning:
             #pos = pygame.Rect((pixelX, pixelY), (cellWidth, cellHeight))
             #pygame.draw.rect(simulationSurface, color, pos)
             pos = (pixelX, pixelY)
-            pygame.draw.circle(simulationSurface, color, pos, random.randint(cellWidth + 3, cellWidth + 8))
+            size = int(cellWidth * cell)
+            pygame.draw.circle(simulationSurface, color, pos, random.randint(size + 3, size + 5))
         
     simulationPos = [30, 50]
     screen.blit(mapImageScaled, simulationPos)
