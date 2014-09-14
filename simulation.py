@@ -4,14 +4,20 @@ class Simulation:
         self.Population = 0.0    # by the thousands
 
         self.Width, self.Height = 100, 100
+        self.Width, self.Height = 10, 10
         self.Grid = [0] * self.Width * self.Height
 
         #for cellNumber, cell in enumerate(simulation.Grid):
         #   x = cellNumber % simulation.Width
         #   y = math.trunc(cellNumber / simulation.Width)
 
-    def PlantTree():
-        pass
+    def PlantTree(self, x, y):
+        index = (y * self.Width) + x
+
+        self.Grid[index] += 0.1
+        if self.Grid[index] > 1.0:
+            self.Grid[index] = 1.0
+            
         
     def Tax(Change = +1):
         pass

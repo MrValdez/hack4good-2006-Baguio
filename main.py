@@ -19,16 +19,20 @@ isRunning = True
 while isRunning:
     screen.fill([0, 0, 0])
     
-    pygame.event.get()
     
     keypress = pygame.key.get_pressed()
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            keypress[pygame.K_ESCAPE] = True
+    
     if keypress[pygame.K_ESCAPE]:
         isRunning = False
         pygame.quit()
         break
     
-    cellWidth = 5
-    cellHeight = 5
+    cellWidth = 50
+    cellHeight = 50
     simulationSize = (cellWidth * simulation.Width, cellHeight * simulation.Height)
     simulationSurface = pygame.Surface(simulationSize)     # http://stackoverflow.com/questions/17581545/drawn-surface-transparency-in-pygame
     colorKey = [127, 33, 33]
@@ -44,8 +48,6 @@ while isRunning:
         pixelY = y * cellHeight 
         pos = pygame.Rect((pixelX, pixelY), (cellWidth, cellHeight))
         
-        #cell = x / simulation.Width
-        cell = random.uniform(0, 1)
         color = pygame.Color(int(255 * cell), int(255 * cell), int(0 * cell))
         
         pygame.draw.rect(simulationSurface, color, pos)
@@ -56,5 +58,16 @@ while isRunning:
     
     screen.blit(simulationSurface, simulationPos)
     
+    mousePos = pygame.mouse.get_pos()
+    simulationRect = pygame.Rect(simulationPos, simulationSize)
+    if simulationRect.collidepoint(mousePos):
+        cellX = (mousePos[0] - simulationPos[0]) / cellWidth
+        cellY = (mousePos[1] - simulationPos[1]) / cellHeight
+        
+        cellX = math.floor(cellX)
+        cellY = math.floor(cellY)
+    
+        simulation.PlantTree(cellX, cellY)
+
     pygame.display.update()
     clock.tick(60)
