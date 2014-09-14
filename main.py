@@ -1,3 +1,6 @@
+import os
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0, 30)   #initial window position
+ 
 import math
 import pygame
 import simulation
@@ -7,17 +10,20 @@ pygame.init()
 pygame.display.set_caption ("Greenhouse simulation")
 
 clock = pygame.time.Clock()
+font = pygame.font.SysFont("timesnewromans", 40)
+text = font.render("Hello, World", True, (255,255,255))
 
 simulation = simulation.Simulation()
 mapImage = pygame.image.load("map.png")
 
-resolution = [1024, 768]
+resolution = [1350, 700]
 screen = pygame.display.set_mode(resolution)
 
     
 isRunning = True
 while isRunning:
     screen.fill([0, 0, 0])
+    screen.blit(text, [0,0])
         
     keypress = pygame.key.get_pressed()
     
@@ -59,12 +65,31 @@ while isRunning:
             pos = (pixelX, pixelY)
             pygame.draw.circle(simulationSurface, color, pos, random.randint(cellWidth + 3, cellWidth + 8))
         
-    simulationPos = [50, 50]
+    simulationPos = [30, 50]
     mapImageScaled = pygame.transform.smoothscale(mapImage, simulationSize)
     screen.blit(mapImageScaled, simulationPos)
     
     screen.blit(simulationSurface, simulationPos)
+
+    color = pygame.Color(255, 255, 255)
+    pos = [simulationPos[0] + maxSimulationSize[0] - 50, simulationPos[1]]
+    size = [20, maxSimulationSize[1] - 5]
+    polutionDensityRect = pygame.Rect(pos, size)
+    pygame.draw.rect(screen, color, polutionDensityRect)
     
+    color = pygame.Color(255, 100, 130)
+    #newHeight = sum(simulation.Grid) / ((simulation.Width + simulation.Height) / 2)
+    size = [20, maxSimulationSize[1] - 5]
+    newHeight = size[1] * (sum(simulation.Grid) / 3400)
+    #if newHeight <= 200: 
+    #    newHeight *= .2
+    
+    pos[1] = size[1] - newHeight + 52
+    size[1] = newHeight
+    polutionDensityRect = pygame.Rect(pos, size)
+    pygame.draw.rect(screen, color, polutionDensityRect)
+    
+    # plant trees    
     mousePos = pygame.mouse.get_pos()
     simulationRect = pygame.Rect(simulationPos, simulationSize)
     if simulationRect.collidepoint(mousePos):
