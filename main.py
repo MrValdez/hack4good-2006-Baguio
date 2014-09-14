@@ -24,6 +24,8 @@ Money = 1000
 Year = 1984
 CurrentYearPos = 0.0
 
+CurrentPowerPos = [0.0, 0.0, 0.0]
+
 simulation = simulation.Simulation()
 mapImage = pygame.image.load("map.png")
 treeImage = pygame.image.load("tree.png")
@@ -156,6 +158,10 @@ while isRunning:
     MenuPos[1] += 10
     TextPos = [MenuPos[0] + 20, MenuPos[1]]
     Menu_Tax = font2.render("Pass Business friendly bill", True, (255,255,255))
+    MenuPos[1] -= 3
+    
+    ButtonPower1 = pygame.Rect(MenuPos, [300 * CurrentPowerPos[0], 24])
+    pygame.draw.rect(screen, pygame.Color(0, 40, 228), ButtonPower1)
     screen.blit(Menu_Tax, TextPos)
 
     MenuPos[1] += 30
@@ -163,6 +169,9 @@ while isRunning:
 
     MenuPos[1] += 10
     TextPos = [MenuPos[0] + 20, MenuPos[1]]
+    MenuPos[1] -= 3
+    ButtonPower2 = pygame.Rect(MenuPos, [300 * CurrentPowerPos[1], 23])
+    pygame.draw.rect(screen, pygame.Color(0, 40, 228), ButtonPower2)
     Menu_Tax = font2.render("Pass Tourism friendly bill", True, (255,255,255))
     screen.blit(Menu_Tax, TextPos)
 
@@ -171,18 +180,29 @@ while isRunning:
 
     MenuPos[1] += 10
     TextPos = [MenuPos[0] + 20, MenuPos[1]]
+    MenuPos[1] -= 4
+    ButtonPower3 = pygame.Rect(MenuPos, [300 * CurrentPowerPos[2], 30])
+    pygame.draw.rect(screen, pygame.Color(120, 255, 100), ButtonPower3)
     Menu_Tax = font2.render("Government Initiative: Green bill", True, (255,255,255))
     screen.blit(Menu_Tax, TextPos)
 
     MenuPos[1] += 30
     pygame.draw.line(screen, [255, 255, 255], MenuPos, [MenuPos[0] + 298, MenuPos[1]])
 
-
     MenuPos[1] += 190
     TextPos = [MenuPos[0] + 20, MenuPos[1]]
     Menu_Money = font.render("Treasury: %sm" % (str(locale.format("%d", Money, grouping=True))), True, (255,255,255))
     screen.blit(Menu_Money, TextPos)
 
+    if mouseClick[0] and ButtonPower1.collidepoint(mousePos) and CurrentPowerPos[0] >= 1:
+        Mode = "Power1"
+        CurrentPowerPos[0] = 0
+    if mouseClick[0] and ButtonPower2.collidepoint(mousePos) and CurrentPowerPos[1] >= 1:
+        Mode = "Power2"
+        CurrentPowerPos[1] = 0
+    if mouseClick[0] and ButtonPower3.collidepoint(mousePos) and CurrentPowerPos[2] >= 1:
+        Mode = "Power3"
+        CurrentPowerPos[2] = 0
     if mouseClick[0] and ButtonPlantingMode.collidepoint(mousePos):
         Mode = "Planting Mode"
 
@@ -199,6 +219,14 @@ while isRunning:
         
     CurrentYearPos += 0.01
     
+    CurrentPowerPos[0] += 0.002
+    CurrentPowerPos[1] += 0.001
+    CurrentPowerPos[2] += 0.0005
+
+    for index, power in enumerate(CurrentPowerPos):
+        if power > 1:
+            CurrentPowerPos[index] = 1
+        
 
     simulation.update()
     pygame.display.update()
