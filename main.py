@@ -18,8 +18,7 @@ screen = pygame.display.set_mode(resolution)
 isRunning = True
 while isRunning:
     screen.fill([0, 0, 0])
-    
-    
+        
     keypress = pygame.key.get_pressed()
     
     for event in pygame.event.get():
@@ -31,8 +30,9 @@ while isRunning:
         pygame.quit()
         break
     
-    cellWidth = 50
-    cellHeight = 50
+    maxSimulationSize = [550, 500]
+    cellWidth = int(maxSimulationSize[0] / simulation.Width)
+    cellHeight = int(maxSimulationSize[1] / simulation.Height)
     simulationSize = (cellWidth * simulation.Width, cellHeight * simulation.Height)
     simulationSurface = pygame.Surface(simulationSize)     # http://stackoverflow.com/questions/17581545/drawn-surface-transparency-in-pygame
     colorKey = [127, 33, 33]
@@ -48,7 +48,7 @@ while isRunning:
         pixelY = y * cellHeight 
         pos = pygame.Rect((pixelX, pixelY), (cellWidth, cellHeight))
         
-        if cell <= 0:
+        if cell <= 0.1:
             color = pygame.Color(*colorKey)
         else:
             color = pygame.Color(int(255 * cell), int(190 * cell), 0)
@@ -73,5 +73,6 @@ while isRunning:
     
         simulation.PlantTree(cellX, cellY)
 
+    simulation.update()
     pygame.display.update()
     clock.tick(60)
