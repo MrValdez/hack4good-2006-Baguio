@@ -11,7 +11,7 @@ clock = pygame.time.Clock()
 simulation = simulation.Simulation()
 mapImage = pygame.image.load("map.png")
 
-resolution = [800, 600]
+resolution = [1024, 768]
 screen = pygame.display.set_mode(resolution)
 
     
@@ -30,7 +30,8 @@ while isRunning:
         pygame.quit()
         break
     
-    maxSimulationSize = [550, 500]
+    #maxSimulationSize = [550, 500]
+    maxSimulationSize = [899, 555]
     cellWidth = int(maxSimulationSize[0] / simulation.Width)
     cellHeight = int(maxSimulationSize[1] / simulation.Height)
     simulationSize = (cellWidth * simulation.Width, cellHeight * simulation.Height)
@@ -38,7 +39,8 @@ while isRunning:
     colorKey = [127, 33, 33]
     simulationSurface.fill(colorKey)
     simulationSurface.set_colorkey(colorKey)
-    simulationSurface.set_alpha(100)
+    #simulationSurface.set_alpha(100)
+    simulationSurface.set_alpha(simulation.PollutionDensity)
     
     for cellNumber, cell in enumerate(simulation.Grid):
         x = cellNumber % simulation.Width
@@ -46,16 +48,17 @@ while isRunning:
         
         pixelX = x * cellWidth
         pixelY = y * cellHeight 
-        pos = pygame.Rect((pixelX, pixelY), (cellWidth, cellHeight))
         
-        if cell <= 0.1:
-            color = pygame.Color(*colorKey)
-        else:
-            color = pygame.Color(int(255 * cell), int(190 * cell), 0)
+        if cell >= 0.5:
+            #color = pygame.Color(int(255 * cell), int(190 * cell), 0)
+            color = pygame.Color(int(230 * cell), int(250 * cell), int(116 * cell))
+                    
+            #color.a = 255
+            #pos = pygame.Rect((pixelX, pixelY), (cellWidth, cellHeight))
+            #pygame.draw.rect(simulationSurface, color, pos)
+            pos = (pixelX, pixelY)
+            pygame.draw.circle(simulationSurface, color, pos, random.randint(cellWidth + 3, cellWidth + 8))
         
-        #color.a = 255
-        pygame.draw.rect(simulationSurface, color, pos)
-    
     simulationPos = [50, 50]
     mapImageScaled = pygame.transform.smoothscale(mapImage, simulationSize)
     screen.blit(mapImageScaled, simulationPos)

@@ -11,19 +11,21 @@ class Simulation:
         self.Grid = [0] * self.Width * self.Height          # this is the pollution grid (todo: variable name will be refactored later)
         self.GridTree = [0] * self.Width * self.Height      # what position has trees
 
-        self.PollutionSpeed = 15
+        self.PollutionSpeed = 10
         self.PollutionSpeedCurrent = 3
 
-        self.SimulationTick = 15
-        self.SimulationTickCurrent = 0
+        self.maxPollution = 1.0
 
-        self.maxPollution = 0.4
-        
+        self.PollutionDensity = 100     # 0 - 255. Affected by current date
+        self.PollutionDensity = 180
+                
     def update(self):
         """
         1. spread polution
         2. lower polution with trees
         """
+        self.PollutionDensity = 100     # 0 - 255
+        
         self.PollutionSpeedCurrent -= 1
         if self.PollutionSpeedCurrent < 0:
             self.PollutionSpeedCurrent = self.PollutionSpeed
@@ -34,25 +36,29 @@ class Simulation:
         self.UpdateFuzzyLimit()
         
     def UpdatePollution(self):           
-        for cellNumber, polution in enumerate(self.Grid):
-            x = cellNumber % self.Width
-            y = math.trunc(cellNumber / self.Width)
-            
-            if x > 0 and y > 0 and x < self.Width - 1 and y < self.Height - 1:   # simplifies the math if we offset by 1 against edges
-                #pollution
-                nDelta = 0.05
-                eDelta = 0.05
-                wDelta = 0.05
-                sDelta = 0.05
+        for cellNumber, polution in enumerate(self.Grid):  
+            x = math.trunc(cellNumber / self.Width)
+            y = cellNumber % self.Width
 
+            if random.random() < 0.7:
+                continue
+                
+            nDelta = 1.05
+            eDelta = 1.05
+            wDelta = 1.05
+            sDelta = 1.05
+
+            if x > 0 and y > 0 and x < self.Width - 1 and y < self.Height - 1:   # simplifies the math if we offset by 1 against edges                
                 north = self.getIndex(x + 0, y - 1)
                 south = self.getIndex(x + 0, y + 1)
                 west = self.getIndex(x - 1, y + 0)
                 east = self.getIndex(x + 1, y + 0)
-                self.Grid[north] *= 1 + nDelta
-                self.Grid[south] *= 1 + sDelta
-                self.Grid[west] *= 1 + wDelta
-                self.Grid[east] *= 1 + eDelta
+                
+                self.Grid[north] *= nDelta
+                self.Grid[south] *= sDelta
+                self.Grid[west] *= wDelta
+                self.Grid[east] *= eDelta
+
     
     def UpdateTrees(self):
         for cellNumber, treeDensity in enumerate(self.GridTree):        
@@ -63,7 +69,7 @@ class Simulation:
     def UpdateFuzzyLimit(self):
         for cellNumber, _ in enumerate(self.Grid):
             currentMinPollution = random.uniform(0, 0.3)
-            #currentMinPollution = 0
+            #currentMinPollution = 0.1
             currentMaxPollution = random.uniform(self.maxPollution - 0.15, self.maxPollution)
             
             if self.Grid[cellNumber] < currentMinPollution:
@@ -105,7 +111,6 @@ class Simulation:
         self.GridTree[southwest] += treeAdded
         self.GridTree[northeast] += treeAdded
         self.GridTree[northwest] += treeAdded
-        
         
     def Tax(Change = +1):
         pass
